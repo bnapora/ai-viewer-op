@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+
+<html lang="en" style="height: 100%;">
+	<head>
+		<meta charset="utf-8">
+		<meta name="robots" content="index, nofollow">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+		<meta name="description" content="Gestalt Test 1">
+		<meta name="application-name" content="Gestalt Test 1">
+		<meta name="themecolor" content="#FFFFFF">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=4">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+
+		<title>Gestalt Test 1</title>
+
+		<script src="js/openseadragon.2.4.2.min.js"></script>
+		<script src="js/ObjectiveTileSource.min.js"></script>
+
+		<style>
+
+			*, *:before, *:after {
+				box-sizing: inherit;
+			}
+
+			html, body {
+				-webkit-box-sizing: border-box;
+				-moz-box-sizing: border-box;
+				box-sizing: border-box;
+				background: #ddeeff;
+				margin: 0;
+				padding: 16px;
+				border: 0;
+				outline: 0;
+			}
+
+			button {
+				min-width: 96px;
+				min-height: 32px;
+				background: #3399ff;
+				outline: none;
+				border: none;
+				margin: 0 16px;
+				border-radius: 4px;
+				color: white;
+			}
+
+		</style>
+
+	</head>
+
+	<body style="display: flex; flex-direction: column; height: 100%;">
+
+		<div style="display: flex; justify-content: center; margin: 0 8px 24px 0;">
+			<button onclick="showUSA()">U.S.A.</button>
+			<button onclick="showChile()">Chile</button>
+			<button onclick="showGermany()">Germany</button>
+			<button onclick="showIndia()">India</button>
+			<button onclick="showDirect()">Direct</button>
+		</div>
+
+		<div id="osdframe" style="flex: 1; background: #fcfcfc;">
+		</div>
+
+		<script>
+
+			imageUSA = {
+					type: "objectivetileservice",
+					region: "US-West",
+					bucket: "global/.Gestalt",
+					filepath: "Replicated/4eee7b944ad5e46c60ce.svs",
+					username: "",
+					authcode: ""
+				}
+
+			imageChile = {
+					type: "objectivetileservice",
+					region: "Chile",
+					bucket: "global/.Gestalt",
+					filepath: "Replicated/4eee7b944ad5e46c60ce.svs",
+					username: "",
+					authcode: ""
+				}
+
+			imageGermany = {
+				type: "objectivetileservice",
+				region: "Germany",
+				bucket: "global/.Gestalt",
+				filepath: "Replicated/4eee7b944ad5e46c60ce.svs",
+				username: "",
+				authcode: ""
+			}
+
+			imageIndia = {
+				type: "objectivetileservice",
+				region: "India",
+				bucket: "global/.Gestalt",
+				filepath: "Replicated/4eee7b944ad5e46c60ce.svs",
+				username: "",
+				authcode: ""
+			}
+
+			imageDirect = {				
+				type: "objectivetileservice",
+				tilesUrl: "https://svs.tissuetek.cloud/global/SVS/Xpress%20Skin/H&E%20x120%20Skin%20A01.svs"
+			}
+
+			var viewer = OpenSeadragon({
+				id: "osdframe",
+				prefixUrl: "openseadragon/images/",
+			});
+
+			function showUSA() {
+				viewer.open(imageUSA);
+			}
+			
+			function showChile() {
+				viewer.open(imageChile);
+			}
+			
+			function showGermany() {
+				viewer.open(imageGermany);
+			}
+			
+			function showIndia() {
+				viewer.open(imageIndia);
+			}
+			
+			function showDirect() {
+				viewer.open(imageDirect);
+			}
+			
+		</script>
+
+	</body>
+</html>

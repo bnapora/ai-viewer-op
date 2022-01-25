@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Gestalt AI Viewer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="utf-8"/>
+
+    <script src="js/d3.v4.min.js"></script>
+    <script src="js/d3-scale-chromatic.v0.3.min.js"></script>
+    <script src="js/jquery-3.5.1.min.js"></script>
+    <link rel="stylesheet" href="css/bootstrap-custom-controls.css">
+    <link rel="stylesheet" href="css/tmcpmain.min.css">
+    <link rel="stylesheet" href="css/GestaltTheme.css">
+
+    <link rel="stylesheet" href="css/style-collapsible.css">
+    <link rel="stylesheet" href="css/annotorious.min.css">
+    <link rel="stylesheet" href="css/tm-icon-style.css">
+    <link rel="stylesheet" href="css/magnifier.css">
+    <!-- <link rel="stylesheet" href="css/mdb.css"> -->
+    
+    <script src="js/bootstrap.4.0.0.bundle.min.js"></script>
+    <!-- <script src="openseadragon/openseadragon.min.js"></script> -->
+    <script src="js/openseadragon.2.4.2.min.js"></script>
+    <script src="js/caman.min.js"></script>
+    <script src="js/openseadragon-filtering.js"></script>
+    <script src="js/openseadragon-svg-overlay.js"></script>
+    <script src="js/openseadragon-scalebar.js"></script>
+    <script src="js/openseadragonselection.js"></script>
+    <script src="js/openseadragon-annotations.js"></script>
+    <script src="js/openseadragon-annotorious.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@recogito/annotorious-toolbar@latest/dist/annotorious-toolbar.min.js"></script> -->
+    <script src="js/annotorious-toolbar.min.js"></script>
+    <script type="text/javascript" src="js/popper.min.js"></script>
+    <!-- <script type="text/javascript" src="js/mdb.js"></script> -->
+
+    <script src="js/utils/interfaceUtils.js"></script>
+    <script src="js/utils/dataUtils.js"></script>
+    <script src="js/utils/CPDataUtils.js"></script>
+    <script src="js/utils/markerUtils.js"></script>
+    <script src="js/utils/OSDViewerUtils.js"></script>
+    <script src="js/utils/HTMLElementUtils.js"></script>
+    <script src="js/utils/regionUtils.js"></script>
+    <script src="js/utils/overlayUtils.js"></script>
+    <script src="js/utils/filterUtils.js"></script>
+    <script src="js/utils/geometryUtils.js"></script>
+    <script src="js/utils/glUtils.js"></script>
+    <script src="js/ai-viewer_opcloud.js"></script>
+    <script src="js/ObjectiveTileSource.min.js"></script>
+</head>
+
+<body>
+    <div class="navbar navbar-default">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="http://www.gestaltdiagnostics.com"><img
+                style="height:50px; margin-top:-15px; overflow: visible; z-index: 9999;"
+                src="misc/gestalt_logo.webp"> </a>
+        </div>
+        <div class="navbar-collapse collapse navbar-responsive-collapse">
+            <ul class="nav navbar-nav">
+                <li class="dropdown">
+                    <a style="visibility: hidden;display:none;" href="#" class="dropdown-toggle" data-toggle="dropdown"
+                        aria-expanded="false">
+                        Projects
+                        <b class="caret"></b>
+                    </a>
+
+                    <ul class="dropdown-menu" style="visibility: hidden;">
+
+                    </ul>
+                </li>
+                <li>
+                    <a id="project_title" href="#"> Slide A</a>
+                </li>
+            </ul>
+            <div style="vertical-align: middle; float: right;">
+                <button class="btn btn-primary" id="menu-toggle">Toggle Sidebar</button>
+            </div>
+        </div>
+    </div>
+    <div id="wrapper" class="container-fluid">
+        <div class="row page-content__row">
+            <!-- Row for viewer  -->
+            <div id="page-content-wrapper" style="position:relative">
+                    <!-- The id is what OSD will look for to draw the viewer, the class is our own css to stylize
+                    The ID will give the prefix for all the objects related to the viewer in this case ISS-->
+                    <div id="ISS_viewer" class="ISS_viewer" style="position:absolute; width:100%">
+                    </div>
+                    <!-- Global marker size slider -->
+                    <div id="ISS_globalmarkersize">
+                        <label>Marker Size Adjuster</label><br>
+                        <input class="form-control" type="range" style="box-shadow: none;"
+                            id="ISS_globalmarkersize_text"
+                            value="100" min="0" max="500" step="10"
+                            oninput="document.getElementById('ISS_globalmarkersize_label').innerHTML = this.value;"/>
+                        <em class="range-label" id="ISS_globalmarkersize_label">100</em>
+                    </div>
+            </div>
+            <div id="sidebar-wrapper">
+                <div class="ISS_menu">
+                    <div class="row row-fullheight" style="padding-bottom: 0px;">
+                        <!-- Level 0 tabs -->
+                        <ul class="nav nav-tabs L0-tabs">
+                            <li> <a href="#markers-iss-gui" data-toggle="tab" aria-expanded="false">Annotations</a></li>
+                            <!-- <li> <a href="#markers-iss-gui" data-toggle="tab" aria-expanded="true"
+                                    class="active main-child">Annotations</a></li> -->
+                            <li> <a href="#markers-regions-gui" data-toggle="tab"
+                                    aria-expanded="false">Regions</a></li>
+                            <li> <a href="#image-gui" data-toggle="tab"
+                                    aria-expanded="false">Image layers</a></li>
+                            <li>
+                                <a href="#magnifier" data-toggle="tab" aria-expanded="false">
+                                    Magnifier
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#worklist" data-toggle="tab" aria-expanded="true" class="active main-child">
+                                    Worklist
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div id="TM-tabs" class="tab-content extended-height">
+                            <!-- TAB 1.1 ISS data  -------------------------------------------------------------------------------- -->
+                            <div class="tab-pane" id="markers-iss-gui" style="height:100%;">
+                                <div class="panel panel-default" style="height:100%;">
+                                    <div class="panel-body row-fullheight">
+                                        <!-- 1.1 Row download -->
+                                        <div id="ISS_rowDownloadMarkers">
+                                        </div>
+                                        <div class="row" >
+                                            <div class="progress" id="ISS_csv_progress_parent" style="visibility:hidden; display:none; margin: 0px 10px 0px 10px;">
+                                                <div id="ISS_csv_progress" class="progress-bar progress-bar-striped" role="progressbar" style="width: 0%; " aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                        </div>
+                                        <!-- 1.1.1 Row of file selection -->
+                                        <div class="row" >
+                                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                                <div id="ISS_input_csv" style="margin-bottom: 5px;">
+                                                    <label id="label_ISS_csv" for="ISS_csv">Import Annotations from CSV:</label>
+                                                    <input class="form-control-file form-control form-control-sm" type="file" id="ISS_csv" name="ISS_csv"
+                                                        accept=".csv,.tsv,.txt">
+                                                    <script type="text/javascript">
+                                                        d3.select("#ISS_csv")
+                                                            .on("change", function () {
+                                                                var file = d3.event.target.files[0];
+                                                                if (file) {
+                                                                    var reader = new FileReader();
+                                                                    reader.onloadend = function (evt) {
+                                                                        var dataUrl = evt.target.result;
+                                                                        dataUtils.readCSV(dataUrl);
+                                                                        // dataUtils.processISSRawData();
+                                                                    };
+                                                                    reader.readAsDataURL(file);
+                                                                }
+                                                            });
+                                                    </script>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- 1.2 Row header selection -->
+                                        <div class="row" id="ISS_csv_headers"
+                                            style="visibility: hidden; display:none;">
+                                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                                <div class="row">
+                                                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                                        <label for="ISS_barcode_header">Code:</label>
+                                                    </div>
+                                                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                                        <select class="custom-select"
+                                                            id="ISS_barcode_header">
+                                                            <option value="null"> </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                                        <label for="ISS_name_header">Name:</label>
+                                                    </div>
+                                                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                                        <select class="custom-select" id="ISS_name_header">
+                                                            <option value="null"></option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                                        <label for="ISS_X_header">X Pos:</label>
+                                                    </div>
+                                                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                                        <select class="custom-select" id="ISS_X_header">
+                                                            <option value="null"></option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                                        <label for="ISS_Y_header">Y Pos:</label>
+                                                    </div>
+                                                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                                        <select class="custom-select" id="ISS_Y_header">
+                                                            <option value="null"></option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                                        <label for="ISS_key_header">Key</label>
+                                                    </div>
+                                                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                                        <select class="custom-select" id="ISS_key_header">
+                                                            <option value="letters">Code</option>
+                                                            <option value="gene_name">Name</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                                        <label for="ISS_color_header">Color (only if one color per marker)</label>
+                                                    </div>
+                                                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                                        <select class="custom-select" id="ISS_color_header">
+                                                            <option value="null"></option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+
+                                                    </div>
+                                                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                                        <button id="ISS_bringmarkers_btn"
+                                                            class="btn btn-primary" type="button">
+                                                            Load Annotations</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- 1.3 Row for barcode search -->
+                                        <div class="row" id="ISS_searchmarkers_row" style="display:None;">
+                                            <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+                                                <label for="ISS_search">Filter:</label>
+                                                <input class="form-control" type="text" id="ISS_search">
+                                            </div>
+                                        </div>
+                                        <!-- 1.4 Row for markers -->
+                                        <div class="row extended-height" id="ISS_markers">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                           
+                            <!-- TAB 1.3 Region data ----------------------------------------------------------------------------- -->
+                            <div class="tab-pane" id="markers-regions-gui" style="height:100%;">
+                                <div class="panel panel-default" style="height:100%;">
+                                    <div class="panel-body" style="height:100%;">
+                                        <div class="row row-fullheight">
+                                            <!-- Tabs 1.3.0 region subtabs -->
+                                            <ul class="nav nav-tabs L2-tabs">
+                                                <li><a href="#markers-regions-project-gui" data-toggle="tab" aria-expanded="false" class="active main-child">Regions</a></li>
+                                                <li><a href="#markers-regions-import-gui" data-toggle="tab"
+                                                        aria-expanded="false">Import</a></li>
+                                                <li><a href="#markers-regions-export-gui" data-toggle="tab"
+                                                        aria-expanded="false">Export</a></li>
+                                            </ul>
+                                            <div id="markers-region-subtabs" class="tab-content extended-height">
+                                                <!-- Tabs 1.3.1 -->
+                                                <div class="tab-pane active" id="markers-regions-project-gui" style="height:100%;">
+                                                    <div class="panel panel-default" style="height:100%;">
+                                                        <div class="panel-body row-fullheight">
+                                                            <div id="ISS_rowDownloadRegions">
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-5">
+                                                                    <button id="ISS_drawregions_btn"
+                                                                        class="btn btn-secondary" type="button">
+                                                                        Draw regions</button>
+                                                                </div>
+                                                                <div class="col-2">
+                                                                    <button id="ISS_fillregions_btn"
+                                                                        class="btn btn-primary" type="button"> Fill
+                                                                        regions</button>
+                                                                </div>
+                                                            </div>
+                                                            <div class="extended-height" id="markers-regions-div">
+                                                                <div class="row" id="markers-regions-panel">
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- Tabs 1.3.2 -->
+                                                <div class="tab-pane" id="markers-regions-import-gui">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-body">
+                                                            <div class="row">
+                                                                <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+                                                                    <input
+                                                                        class="form-control-file form-control form-control-sm"
+                                                                        type="file" id="ISS_region_files_import"
+                                                                        name="files[]" />
+                                                                    <br>
+                                                                </div>
+                                                                <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                                                                    <button id="ISS_import_regions"
+                                                                        class="btn btn-primary" type="button">
+                                                                        Import</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- Tabs 1.3.3 -->
+                                                <div class="tab-pane" id="markers-regions-export-gui">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-body">
+                                                            <div class="row">
+                                                                <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+                                                                    <label for="ISS_region_file_name">Download
+                                                                        regions for later use</label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+                                                                    <input class="form-control form-control-sm"
+                                                                        type="text" id="ISS_region_file_name"
+                                                                        placeholder="regions.json"
+                                                                        value="regions.json">
+                                                                </div>
+                                                                <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                                                                    <button id="ISS_export_regions"
+                                                                        class="btn btn-primary" type="button">
+                                                                        Export</button>
+                                                                </div>
+                                                            </div>
+                                                            <br>
+                                                            <div class="row">
+                                                                <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+                                                                    <label for="ISS_region_csv_name">Download
+                                                                        expression in regions</label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+                                                                    <input class="form-control form-control-sm"
+                                                                        type="text" id="ISS_region_csv_name"
+                                                                        placeholder="regions.csv"
+                                                                        value="regions.csv" />
+                                                                </div>
+                                                                <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                                                                    <button id="ISS_export_regions_csv"
+                                                                        class="btn btn-primary" type="button">
+                                                                        Export</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- TAB 1.4 Overlay data ----------------------------------------------------------------------------- -->
+                            <div class="tab-pane" id="image-gui" style="height:100%;">
+                                <div class="panel panel-default" style="height:100%;">
+                                    <div class="panel-body">
+                                        <div class="row" id="image-overlay-panel" style="overflow-x:scroll;margin-bottom:10px;">
+
+                                        </div>
+                                        <div class="row">
+                                            <a href="#filterSettings" data-toggle="collapse" aria-expanded="false">[Filter settings]</a>
+                                        </div>
+                                        <div class="row collapse" id="filterSettings">
+
+                                        </div>
+                                    </div>
+                                </div> <!-- end of a main panel -->
+                            </div> <!-- end of image-gui-->
+                            <!--- TAB 1.5 Magnifier ------------------>
+                            <div class="tab-pane" id="magnifier" style="height:100%;">
+                                <div class="panel panel-default" style="height:100%;">
+                                    <div class="panel-body">
+                                        <div id="ISS_magnifier" class="magnifier magnifier--square magnifier--active">
+                                        </div>
+                                        <h4>Settings</h4>
+                                        <h4>Metrics</h4>
+                                    </div>
+                                </div> <!-- end of a main panel -->
+                            </div> <!-- end of image-gui-->
+                            <!--- TAB 1.6 Worklist------------------>
+                            <div class="tab-pane active" id="worklist" style="height:100%;">
+                                <div class="panel panel-default" style="height:100%;">
+                                    <div class="panel-body">
+                                        <div>
+                                            <h4>
+                                                Worklist:
+                                            </h4>
+                                        </div>
+                                        <div id="lg-slidelist-group">
+                                        </div><br>                                                                       
+                                        <div>
+                                            <h4>
+                                                Region Nodes:
+                                            </h4>
+                                            <div id=rd-node-group></div>
+                                        </div>
+                                    </div>
+                                </div> <!-- end of a main panel -->
+                            </div> <!-- end of image-gui-->
+                            <script type="text/javascript">
+                                // Specify the JSON data to be displayed
+                                var slideData =
+                                [
+                                    {
+                                    "filename": "4eee7b944ad5e46c60ce.svs",
+                                    "label": "4eee7b944ad5e46c60ce"
+                                    },
+                                    {
+                                    "filename": "BRQA-1_HE.svs",
+                                    "label": "BRQA-1_HE"
+                                    },
+                                    {
+                                    "filename": "BRQA-1_ER.svs",
+                                    "label": "BRQA-1_ER"
+                                    },
+                                    {
+                                    "filename": "BRQA-1_PR.svs",
+                                    "label": "BRQA-1_PR"
+                                    },
+                                    {
+                                    "filename": "BRQA-1_HER2.svs",
+                                    "label": "BRQA-1_HER2"
+                                    },
+                                    {
+                                    "filename": "BRQA-1_Ki67.svs",
+                                    "label": "BRQA-1_Ki67"
+                                    }
+                                ];
+                                // List of available OP Cloud Nodes
+                                var opnodeOptions = ["US-West", "Chile", "Germany", "India"]
+
+                                //Load Slide List Group & Node Selector Buttons
+                                tmapp.opcloud_image_filename = slideData[0].filename;
+                                tmapp.opcloud_image_node = opnodeOptions[0]; 
+
+                                $(document).ready(function () {
+                                    // Generate Slide List Group
+                                    for (var i = 0, len = slideData.length; i < len; ++i) {
+                                        var slide = slideData[i];
+                                        var html_slides = "";
+                                        if (slide.filename == tmapp.opcloud_image_filename) {
+                                            html_slide = '<a class="list-group-item active" '
+                                        } else {
+                                            html_slide = '<a class="list-group-item" '
+                                        }
+                                        html_slide +=   'id="' + slide.filename + '">' + slide.label 
+                                        html_slide +=       '<span class="badge badge-primary badge-pill">849 MB</span>'
+                                        html_slide +=   '</a>'
+
+                                        $(html_slide).hide().appendTo('#lg-slidelist-group').slideDown();
+                                    };
+                                    // Generate region node switches
+                                    for (var i = 0, len = opnodeOptions.length; i < len; ++i) {
+                                        var html_nodes = "";
+                                        html_nodes = '<div class="custom-control custom-switch">';
+                                        
+                                        if (opnodeOptions[i] == tmapp.opcloud_image_node) {
+                                            html_nodes +=    '<input type="radio" class="custom-control-input" name="rdNodes" id="rd_node' + i + '" value="' + opnodeOptions[i] + '" checked>';
+                                        } else {
+                                            html_nodes +=    '<input type="radio" class="custom-control-input" name="rdNodes" id="rd_node' + i + '" value="' + opnodeOptions[i] + '">';
+                                        }
+                                        html_nodes +=    '<label class="custom-control-label" for="rd_node' + i + '">' + opnodeOptions[i] + '</label>';
+                                        html_nodes += '</div>'
+
+                                        $(html_nodes).appendTo('#rd-node-group')
+                                    };
+                                });
+                                //Change 'active' list-group-item; open image
+                                $(document).ready(function() {
+                                    $('.list-group-item').on('click', function() {
+                                        var $this = $(this);
+                                        tmapp.opcloud_image_filename = ($this).attr('id');
+
+                                        $('.active').removeClass('active');
+                                        $this.toggleClass('active');
+
+                                        openImage(tmapp.opcloud_image_filename, tmapp.opcloud_image_node)
+                                    })
+                                });
+                                //Change OPCloud node; open image
+                                $(document).ready(function() {
+                                    $('input[type=radio][name=rdNodes]').on('change', function() {
+                                        var $this = $(this);
+                                        tmapp.opcloud_image_node = ($this).attr('value');
+                                        openImage(tmapp.opcloud_image_filename, tmapp.opcloud_image_node);
+                                    })
+                                });
+
+                            </script>
+                        </div> <!-- end of TM-tabs-->
+                    </div> <!-- end of Level 0 tabs -->
+                </div> <!-- end of lateral panel -->
+            </div>
+        </div><!-- end of single row -->
+    </div><!-- end of container-fuild-->
+</body>
+
+<script>
+    
+    var openImage = function (filename, opcloud_node) {
+        opcloudImage = {
+            type: "objectivetileservice",
+            region: opcloud_node,
+            bucket: "global/.Gestalt",
+            filepath: "Replicated/" + filename,
+            username: "",
+            authcode: ""
+        }
+        tmapp.ISS_viewer.open(opcloudImage);
+    }
+    document.getElementById("project_title").innerText = "Gestalt AI Viewer";
+    $(document).ready(function () {
+        var path_DZI = "Test.dzi"
+        tmapp.fixed_file = path_DZI;
+	    tmapp.layers =[{name:"HE",tileSource: path_DZI}];        
+
+        tmapp.registerActions();
+        tmapp.init();
+
+        openImage(tmapp.opcloud_image_filename, tmapp.opcloud_image_node);
+    });
+
+</script>
+<script>
+    $("#menu-toggle").click(function (e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+    });
+</script>
+
+</html>
